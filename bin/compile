@@ -4,8 +4,8 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 
 VENDOR_DIR="$BUILD_DIR/vendor"
-INSTALL_DIR="$VENDOR_DIR/imagemagick-webp"
-CACHE_FILE="$CACHE_DIR/imagemagick-webp.tar.gz"
+INSTALL_DIR="$VENDOR_DIR/imagemagick-from-source"
+CACHE_FILE="$CACHE_DIR/imagemagick-from-source.tar.gz"
 
 mkdir -p $CACHE_DIR
 mkdir -p $VENDOR_DIR
@@ -35,7 +35,7 @@ if [ ! -f $CACHE_FILE ]; then
 
   echo "-----> Caching ImageMagick installation"
   cd $VENDOR_DIR
-  REL_INSTALL_DIR="imagemagick-webp"
+  REL_INSTALL_DIR="imagemagick-from-source"
   tar czf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
   mv $REL_INSTALL_DIR.tar.gz $CACHE_FILE
 
@@ -50,9 +50,9 @@ fi
 # update PATH and LD_LIBRARY_PATH
 
 echo "-----> Updating environment variables"
-PROFILE_PATH="$BUILD_DIR/.profile.d/imagemagick-webp.sh"
+PROFILE_PATH="$BUILD_DIR/.profile.d/imagemagick-from-source.sh"
 # Single quotes since we want $HOME to be resolved at runtime, not build time.
-RUNTIME_INSTALL_PATH='$HOME/vendor/imagemagick-webp'
+RUNTIME_INSTALL_PATH='$HOME/vendor/imagemagick-from-source'
 mkdir -p $(dirname $PROFILE_PATH)
 echo "export PATH=$RUNTIME_INSTALL_PATH/bin:\$PATH" >> $PROFILE_PATH
 echo "export LD_LIBRARY_PATH=$RUNTIME_INSTALL_PATH/lib:\$LD_LIBRARY_PATH" >> $PROFILE_PATH

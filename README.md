@@ -1,40 +1,62 @@
-heroku-buildpack-imagemagick-webp
+imagemagick-from-source-buildpack
 ===========================
 
-Use [ImageMagick](www.imagemagick.org) built with [libwebp](https://code.google.com/p/webp/) inside a Heroku _Cedar_ environment. This buildpack will download both libraries, build them from source and install them along side your app. Your ```$PATH``` and ```$LD_LIBRARY_PATH``` will also be updated to use this version of ImageMagick instead of the default Heroku one, which does _not_ currently have libwebp support.
+Use [ImageMagick](www.imagemagick.org) from source inside a Heroku/Scalingo environment. This buildpack will download the library, build it from source and install it along side your app. Your ```$PATH``` and ```$LD_LIBRARY_PATH``` will also be updated to use this version of ImageMagick instead of the default Heroku/Scalingo one, which may _not_ have support of some formats (like WebP).
 
-Since this buildpack is building libwebp and ImageMagick from source your first deploy will take a very long time (around 10 mins). However after building once the installed libraries are stored in a cache directory and will be used for all future deploys. If for any reason you want to force a rebuild of libwebp and ImageMagick, please check out the [heroku-repo](https://github.com/heroku/heroku-repo) plugin.
+Since this buildpack is building ImageMagick from source your first deploy will take a very long time (around 10 mins). However after building once the installed library is stored in a cache directory and will be used for all future deploys. If for any reason you want to force a rebuild of ImageMagick, please check out:
+- For Heroku, the [heroku-repo](https://github.com/heroku/heroku-repo) plugin.
+- For Scalingo, [clear the deployment cache](https://doc.scalingo.com/platform/deployment/cache) with the CLI tool.
 
 ## Usage
 
-This buildpack is meant to be used through 
-[heroku-buildpack-multi](https://github.com/ddollar/heroku-buildpack-multi),
-so in your app you need to:
+### Heroku
+
 ```
-heroku config:set BUILDPACK_URL=https://github.com/ddollar/heroku-buildpack-multi
+heroku buildpacks:add --index 1 https://github.com/SebouChu/imagemagick-from-source-buildpack.git
 ```
 
-Then create a `.buildpacks` file inside your app:
-```
-https://github.com/nrj/heroku-buildpack-imagemagick-webp
-https://github.com/heroku/heroku-buildpack-nodejs
+### Scalingo
+
+Create a `.buildpacks` file inside your app and add the buildpack like this:
+```bash
+https://github.com/SebouChu/imagemagick-from-source-buildpack.git
+# Other buildpacks...
+https://github.com/Scalingo/ruby-buildpack
 ```
 
-The second line is for a nodejs buildpack, but it can be any other buildpack you want. If it is not working with yours, please report a bug.
+The last line is for a Ruby application, but it can be any other buildpack you want. If it is not working with yours, please report a bug.
+
+**NOTE**: The ImageMagick binary included in the `scalingo-18` stack does not support WebP natively. Here is what to do:
+
+Add the [APT buildpack](https://doc.scalingo.com/platform/deployment/buildpacks/apt) before this buildpack in the `.buildpacks` file.
+```bash
+https://github.com/Scalingo/apt-buildpack.git
+https://github.com/SebouChu/imagemagick-from-source-buildpack.git
+# ...
+```
+
+Create an `Aptfile` file inside your app and add the WebP library:
+```
+libwebp-dev
+```
 
 ## Verify Installation
 
-You can verify that ImageMagick was built with libwebp support by running the following:
+You can verify that ImageMagick was built correctly by running the following command:
+- Heroku : `heroku run convert --version`
+- Scalingo : `scalingo run convert --version`
 
-```
-heroku run "identify -list format"
-```
+If the output matches the version specified in `bin/compile`, you're all set.
 
-If the output includes ```WEBP* rw-   WebP Image Format (libwebp 0.4.2)``` then you're all set.
+To verify the WebP support, run the following command:
+- Heroku : `heroku run identify -list format`
+- Scalingo : `scalingo run identify -list format`
 
+If the output includes `WEBP`, you're all set.
 
 ## LICENSE - "MIT License"
 
+Copyright (c) 2021 Sébastien Gaya, https://sebastiengaya.fr
 Copyright (c) 2014 Nick Jensen, https://nrj.io
 Copyright (C) 2012 Heroku, Inc.
 
