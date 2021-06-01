@@ -14,57 +14,6 @@ if [ ! -f $CACHE_FILE ]; then
 
   cd $BUILD_DIR
 
-  # install nasm
-
-  NASM_VERSION="2.11.08"
-  NASM_FILE="nasm-$NASM_VERSION.tar.gz"
-  NASM_DIR="nasm-$NASM_VERSION"
-  NASM_URL="http://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/$NASM_FILE"
-
-  echo "-----> Downloading nasm from $NASM_URL"
-  curl -L --silent $NASM_URL | tar xz
-
-  echo "-----> Building nasm"
-  cd $NASM_DIR
-  ./configure --prefix=$INSTALL_DIR
-  make && make install
-  cd ..
-  rm -rf $NASM_DIR
-
-  # install jpegturbo
-
-  JPEGTURBO_VERSION="1.4.0"
-  JPEGTURBO_FILE="libjpeg-turbo-$JPEGTURBO_VERSION.tar.gz"
-  JPEGTURBO_DIR="libjpeg-turbo-$JPEGTURBO_VERSION"
-  JPEGTURBO_URL="http://sourceforge.net/projects/libjpeg-turbo/files/$JPEGTURBO_VERSION/$JPEGTURBO_FILE/download"
-
-  echo "-----> Downloading jpegturbo from $JPEGTURBO_URL"
-  curl -L --silent $JPEGTURBO_URL | tar xz
-
-  echo "-----> Building jpegturbo"
-  cd $JPEGTURBO_DIR
-  ./configure --prefix=$INSTALL_DIR NASM=$INSTALL_DIR/bin/nasm --disable-static
-  make && make install
-  cd ..
-  rm -rf $LIBWEBP_DIR
-
-  # install libwebp
-
-  LIBWEBP_VERSION="0.4.3"
-  LIBWEBP_FILE="libwebp-$LIBWEBP_VERSION.tar.gz"
-  LIBWEBP_DIR="libwebp-$LIBWEBP_VERSION"
-  LIBWEBP_URL="http://downloads.webmproject.org/releases/webp/$LIBWEBP_FILE"
-
-  echo "-----> Downloading libwebp from $LIBWEBP_URL"
-  curl -L --silent $LIBWEBP_URL | tar xz
-
-  echo "-----> Building libwebp"
-  cd $LIBWEBP_DIR
-  ./configure --prefix=$INSTALL_DIR --disable-static
-  make && make install
-  cd ..
-  rm -rf $LIBWEBP_DIR
-
   # install imagemagick
 
   IMAGE_MAGICK_VERSION="7.0.11-14"
@@ -86,7 +35,7 @@ if [ ! -f $CACHE_FILE ]; then
 
   # cache for future deploys
 
-  echo "-----> Caching ImageMagick and libwebp installation"
+  echo "-----> Caching ImageMagick installation"
   cd $VENDOR_DIR
   REL_INSTALL_DIR="imagemagick-webp"
   tar czf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
@@ -96,7 +45,7 @@ else
 
   # cache exists, extract it
 
-  echo "-----> Extracting ImageMagick and libwebp $CACHE_FILE => $VENDOR_DIR"
+  echo "-----> Extracting ImageMagick $CACHE_FILE => $VENDOR_DIR"
   tar xzf $CACHE_FILE -C $VENDOR_DIR
 fi
 
